@@ -83,7 +83,7 @@ public class WithdrawalView extends BaseView {
             }
         }
 
-        // Set selected account if provided and withdrawable
+        
         if (selectedAccount != null && selectedAccount.canWithdraw()) {
             String selectedValue = selectedAccount.getAccountNumber() + " - " + selectedAccount.getAccountType() + " - BWP " + selectedAccount.getBalance();
             accountComboBox.setValue(selectedValue);
@@ -264,4 +264,5 @@ public class WithdrawalView extends BaseView {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
 }
