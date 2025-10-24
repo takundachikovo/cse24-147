@@ -171,7 +171,7 @@ public class TransactionHistoryView extends BaseView {
 
 
         if (transactions.isEmpty()) {
-            // Add some sample transactions for demonstration
+            
             transactions.add(new Transaction(1000.0, "DEPOSIT", account));
             transactions.add(new Transaction(500.0, "WITHDRAWAL", account));
             transactions.add(new Transaction(50.0, "INTEREST", account));
@@ -180,4 +180,5 @@ public class TransactionHistoryView extends BaseView {
 
         transactionTable.getItems().addAll(transactions);
     }
+
 }
