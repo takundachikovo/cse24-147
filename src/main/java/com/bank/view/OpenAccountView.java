@@ -18,8 +18,6 @@ public class OpenAccountView extends BaseView {
     private Stage primaryStage;
     private Customer currentCustomer;
     private String selectedAccountType = "SAVINGS";
-    private javafx.scene.control.TextField companyNameField;
-    private javafx.scene.control.TextField companyAddressField;
 
     public OpenAccountView(Stage primaryStage, LoginController loginController, AccountController accountController) {
         super();
@@ -32,7 +30,6 @@ public class OpenAccountView extends BaseView {
 
     private void initializeView() {
         view.setPadding(new Insets(20));
-
 
         HBox headerBox = new HBox();
         headerBox.setAlignment(Pos.CENTER_LEFT);
@@ -50,7 +47,6 @@ public class OpenAccountView extends BaseView {
         headerBox.getChildren().addAll(bankLabel, spacer, breadcrumbLabel);
         view.getChildren().add(headerBox);
 
-        
         VBox contentBox = new VBox(20);
         contentBox.setPadding(new Insets(20));
         contentBox.setStyle("-fx-background-color: white; " +
@@ -64,7 +60,6 @@ public class OpenAccountView extends BaseView {
         Label subtitleLabel = new Label("Choose the account type that fits your needs");
         subtitleLabel.setStyle("-fx-text-fill: #4a5568;");
 
-
         VBox accountSelectionBox = new VBox(15);
         Label selectionLabel = new Label("Select Account Type");
         selectionLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1a365d;");
@@ -72,36 +67,20 @@ public class OpenAccountView extends BaseView {
         HBox accountCardsBox = new HBox(20);
         accountCardsBox.setAlignment(Pos.TOP_CENTER);
 
-        
-        VBox savingsCard = createAccountTypeCard(
-                "💰", "Savings Account",
-                "0.05% monthly interest", "No withdrawals", "No minimum balance"
-        );
-
-        
-        VBox investmentCard = createAccountTypeCard(
-                "📈", "Investment Account",
-                "5% monthly interest", "Withdrawals allowed", "BWP 500 minimum"
-        );
-
-        
-        VBox chequeCard = createAccountTypeCard(
-                "🏦", "Cheque Account",
-                "No interest", "Unlimited transactions", "Employment required"
-        );
+        VBox savingsCard = createAccountTypeCard("💰", "Savings Account", "0.05% monthly interest", "No withdrawals", "No minimum balance");
+        VBox investmentCard = createAccountTypeCard("📈", "Investment Account", "5% monthly interest", "Withdrawals allowed", "BWP 500 minimum");
+        VBox chequeCard = createAccountTypeCard("🏦", "Cheque Account", "No interest", "Unlimited transactions", "Employment required");
 
         accountCardsBox.getChildren().addAll(savingsCard, investmentCard, chequeCard);
         accountSelectionBox.getChildren().addAll(selectionLabel, accountCardsBox);
 
-
         VBox formBox = new VBox(15);
         formBox.setPadding(new Insets(20, 0, 0, 0));
-        formBox.setStyle("-fx-min-height: 300px;"); // Ensure minimum height
+        formBox.setStyle("-fx-min-height: 300px;");
 
         contentBox.getChildren().addAll(titleLabel, subtitleLabel, accountSelectionBox, formBox);
         view.getChildren().add(contentBox);
 
-       
         selectAccountType(savingsCard, "SAVINGS");
     }
 
@@ -134,7 +113,6 @@ public class OpenAccountView extends BaseView {
 
         card.getChildren().addAll(emojiLabel, titleLabel, featuresBox, selectLabel);
 
-        
         card.setOnMouseClicked(e -> selectAccountType(card, getAccountTypeFromTitle(title)));
 
         return card;
@@ -153,7 +131,6 @@ public class OpenAccountView extends BaseView {
     }
 
     private void selectAccountType(VBox selectedCard, String accountType) {
-       
         HBox parent = (HBox) selectedCard.getParent();
         for (javafx.scene.Node node : parent.getChildren()) {
             if (node instanceof VBox) {
@@ -166,7 +143,6 @@ public class OpenAccountView extends BaseView {
             }
         }
 
-       
         selectedCard.setStyle("-fx-background-color: #ebf8ff; " +
                 "-fx-background-radius: 10px;" +
                 "-fx-border-radius: 10px;" +
@@ -186,26 +162,22 @@ public class OpenAccountView extends BaseView {
         formTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1a365d;");
         formBox.getChildren().add(formTitle);
 
-       
         javafx.scene.control.TextField initialDepositField = createTextField("Initial Deposit Amount");
 
-        
         if ("INVESTMENT".equals(selectedAccountType)) {
             Label investmentWarning = new Label("Minimum opening deposit: BWP 500.00");
             investmentWarning.setStyle("-fx-text-fill: #d69e2e; -fx-font-weight: bold;");
             formBox.getChildren().add(investmentWarning);
         } else if ("CHEQUE".equals(selectedAccountType)) {
-            companyNameField = createTextField("Company Name");
-            companyAddressField = createTextField("Company Address");
+            javafx.scene.control.TextField companyNameField = createTextField("Company Name");
+            javafx.scene.control.TextField companyAddressField = createTextField("Company Address");
             formBox.getChildren().addAll(companyNameField, companyAddressField);
         }
 
-        
         javafx.scene.control.CheckBox termsCheckbox = new javafx.scene.control.CheckBox("I agree to the terms and conditions for opening a " +
                 selectedAccountType.toLowerCase() + " account");
         termsCheckbox.setStyle("-fx-text-fill: #4a5568;");
 
-        
         VBox buttonsBox = new VBox(10);
         buttonsBox.setStyle("-fx-alignment: center; -fx-padding: 20 0 0 0;");
 
@@ -216,14 +188,13 @@ public class OpenAccountView extends BaseView {
 
         formBox.getChildren().addAll(initialDepositField, termsCheckbox, buttonsBox);
 
-        
         openAccountBtn.setOnAction(e -> {
             String companyName = "";
             String companyAddress = "";
 
             if ("CHEQUE".equals(selectedAccountType)) {
-                companyName = companyNameField.getText();
-                companyAddress = companyAddressField.getText();
+                companyName = ((javafx.scene.control.TextField) formBox.getChildren().get(2)).getText();
+                companyAddress = ((javafx.scene.control.TextField) formBox.getChildren().get(3)).getText();
             }
 
             handleOpenAccount(initialDepositField.getText(), companyName, companyAddress, termsCheckbox.isSelected());
