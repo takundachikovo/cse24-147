@@ -39,7 +39,6 @@ public class TransactionHistoryView extends BaseView {
     private void initializeView() {
         view.setPadding(new Insets(20));
 
-        
         HBox headerBox = new HBox();
         headerBox.setAlignment(Pos.CENTER_LEFT);
         headerBox.setPadding(new Insets(0, 0, 20, 0));
@@ -56,7 +55,6 @@ public class TransactionHistoryView extends BaseView {
         headerBox.getChildren().addAll(bankLabel, spacer, breadcrumbLabel);
         view.getChildren().add(headerBox);
 
-
         VBox contentBox = new VBox(20);
         contentBox.setPadding(new Insets(20));
         contentBox.setStyle("-fx-background-color: white; " +
@@ -70,7 +68,6 @@ public class TransactionHistoryView extends BaseView {
         Label subtitleLabel = new Label("View your account transactions and activity");
         subtitleLabel.setStyle("-fx-text-fill: #4a5568;");
 
-        
         VBox selectionBox = new VBox(10);
         Label accountLabel = new Label("Select Account");
         accountLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1a365d;");
@@ -79,7 +76,6 @@ public class TransactionHistoryView extends BaseView {
         accountComboBox.setPrefWidth(300);
         accountComboBox.setStyle("-fx-pref-height: 40px;");
 
-        
         for (Account account : currentCustomer.getAccounts()) {
             accountComboBox.getItems().add(account.getAccountNumber() + " - " + account.getAccountType() + " - BWP " + account.getBalance());
         }
@@ -90,14 +86,12 @@ public class TransactionHistoryView extends BaseView {
 
         selectionBox.getChildren().addAll(accountLabel, accountComboBox);
 
-        
         VBox tableBox = new VBox(10);
         Label tableLabel = new Label("Recent Transactions");
         tableLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1a365d;");
 
         transactionTable = createTransactionsTable();
         tableBox.getChildren().addAll(tableLabel, transactionTable);
-
 
         HBox buttonsBox = new HBox();
         buttonsBox.setAlignment(Pos.CENTER_LEFT);
@@ -109,7 +103,6 @@ public class TransactionHistoryView extends BaseView {
         contentBox.getChildren().addAll(titleLabel, subtitleLabel, selectionBox, tableBox, buttonsBox);
         view.getChildren().add(contentBox);
 
-        
         accountComboBox.setOnAction(e -> {
             int selectedIndex = accountComboBox.getSelectionModel().getSelectedIndex();
             if (selectedIndex >= 0) {
@@ -123,7 +116,6 @@ public class TransactionHistoryView extends BaseView {
             primaryStage.getScene().setRoot(dashboardView.getView());
         });
 
-        // Load initial transactions if accounts exist
         if (!currentCustomer.getAccounts().isEmpty()) {
             loadTransactions(currentCustomer.getAccounts().get(0));
         }
@@ -134,26 +126,22 @@ public class TransactionHistoryView extends BaseView {
         table.setStyle("-fx-background-color: white; -fx-border-color: #e2e8f0;");
         table.setPrefHeight(400);
 
-
         TableColumn<Transaction, String> dateColumn = new TableColumn<>("Date");
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
         dateColumn.setPrefWidth(150);
         dateColumn.setStyle("-fx-alignment: CENTER_LEFT;");
 
-        
         TableColumn<Transaction, String> typeColumn = new TableColumn<>("Type");
         typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
         typeColumn.setPrefWidth(100);
         typeColumn.setStyle("-fx-alignment: CENTER;");
 
-        
-        TableColumn<Transaction, String> amountColumn = new TableColumn<>("Amount");
+        TableColumn<Transaction, Double> amountColumn = new TableColumn<>("Amount");
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
         amountColumn.setPrefWidth(120);
         amountColumn.setStyle("-fx-alignment: CENTER_RIGHT;");
 
-        
-        TableColumn<Transaction, String> balanceColumn = new TableColumn<>("Balance After");
+        TableColumn<Transaction, Double> balanceColumn = new TableColumn<>("Balance After");
         balanceColumn.setCellValueFactory(new PropertyValueFactory<>("balanceAfter"));
         balanceColumn.setPrefWidth(120);
         balanceColumn.setStyle("-fx-alignment: CENTER_RIGHT;");
@@ -166,12 +154,9 @@ public class TransactionHistoryView extends BaseView {
     private void loadTransactions(Account account) {
         transactionTable.getItems().clear();
 
-
         List<Transaction> transactions = accountController.getAccountTransactions(account.getAccountNumber());
 
-
         if (transactions.isEmpty()) {
-            
             transactions.add(new Transaction(1000.0, "DEPOSIT", account));
             transactions.add(new Transaction(500.0, "WITHDRAWAL", account));
             transactions.add(new Transaction(50.0, "INTEREST", account));
@@ -179,6 +164,6 @@ public class TransactionHistoryView extends BaseView {
         }
 
         transactionTable.getItems().addAll(transactions);
+        System.out.println("Loaded " + transactions.size() + " transactions for account: " + account.getAccountNumber());
     }
-
 }
