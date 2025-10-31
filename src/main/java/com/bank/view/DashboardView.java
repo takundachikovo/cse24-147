@@ -4,6 +4,7 @@ import com.bank.controller.AccountController;
 import com.bank.controller.LoginController;
 import com.bank.model.Account;
 import com.bank.model.Customer;
+import com.bank.model.Transaction;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -11,6 +12,8 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+
+import java.util.List;
 
 public class DashboardView extends BaseView {
     private LoginController loginController;
@@ -31,30 +34,23 @@ public class DashboardView extends BaseView {
         view.setPadding(new Insets(20));
         view.setStyle("-fx-background-color: #f7fafc;");
 
-        
         currentCustomer.setAccounts(accountController.getCustomerAccounts(currentCustomer.getCustomerId()));
 
-        
         HBox headerBox = createHeader();
         view.getChildren().add(headerBox);
 
-     
         VBox welcomeSection = createWelcomeSection();
         view.getChildren().add(welcomeSection);
 
-        
         VBox accountsSection = createAccountsSection();
         view.getChildren().add(accountsSection);
 
-        
         VBox quickActionsSection = createQuickActionsSection();
         view.getChildren().add(quickActionsSection);
 
-       
         VBox recentActivitySection = createRecentActivitySection();
         view.getChildren().add(recentActivitySection);
 
-       
         HBox footerBox = createFooter();
         view.getChildren().add(footerBox);
     }
@@ -73,11 +69,9 @@ public class DashboardView extends BaseView {
         HBox navBox = new HBox(20);
         navBox.setAlignment(Pos.CENTER_RIGHT);
 
-        
         Hyperlink dashboardLink = new Hyperlink("Dashboard");
         Hyperlink profileLink = new Hyperlink("Profile");
 
-        
         dashboardLink.setStyle("-fx-text-fill: #4a5568; -fx-font-size: 14px;");
         profileLink.setStyle("-fx-text-fill: #4a5568; -fx-font-size: 14px;");
 
@@ -90,7 +84,6 @@ public class DashboardView extends BaseView {
         navBox.getChildren().addAll(dashboardLink, profileLink, welcomeLabel, logoutLink);
         headerBox.getChildren().addAll(bankLabel, spacer, navBox);
 
-       
         logoutLink.setOnAction(e -> {
             loginController.logout();
             LoginView loginView = new LoginView(primaryStage);
@@ -111,7 +104,6 @@ public class DashboardView extends BaseView {
         Label subtitleLabel = new Label("Manage your accounts and track your financial growth");
         subtitleLabel.setStyle("-fx-text-fill: #4a5568;");
 
-        
         HBox statsBox = new HBox(30);
         statsBox.setAlignment(Pos.CENTER_LEFT);
 
@@ -151,13 +143,11 @@ public class DashboardView extends BaseView {
         HBox accountsGrid = new HBox(20);
         accountsGrid.setAlignment(Pos.TOP_LEFT);
 
-        
         for (Account account : currentCustomer.getAccounts()) {
             VBox accountCard = createAccountCard(account);
             accountsGrid.getChildren().add(accountCard);
         }
 
-        
         if (currentCustomer.getAccounts().size() < 3) {
             VBox newAccountCard = createNewAccountCard();
             accountsGrid.getChildren().add(newAccountCard);
@@ -173,7 +163,6 @@ public class DashboardView extends BaseView {
         card.setPrefWidth(250);
         card.setStyle("-fx-background-color: white; -fx-background-radius: 10px; -fx-border-radius: 10px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
 
-        
         String badgeColor = "";
         if ("SAVINGS".equals(account.getAccountType())) {
             badgeColor = "#38a169";
@@ -188,11 +177,9 @@ public class DashboardView extends BaseView {
         Label typeLabel = new Label(account.getAccountType());
         typeLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: white; -fx-padding: 5px 10px; -fx-background-color:" + badgeColor + "; -fx-background-radius: 15px;");
 
-        
         Label balanceLabel = new Label(String.format("BWP %.2f", account.getBalance()));
         balanceLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1a365d;");
 
-        
         String interestRate = "";
         if ("SAVINGS".equals(account.getAccountType())) {
             interestRate = "0.05% monthly";
@@ -207,7 +194,6 @@ public class DashboardView extends BaseView {
         Label interestLabel = new Label("Interest: " + interestRate);
         interestLabel.setStyle("-fx-text-fill: #4a5568; -fx-font-size: 12px;");
 
-        
         HBox actionsBox = new HBox(10);
 
         javafx.scene.control.Button depositBtn = new javafx.scene.control.Button("Deposit");
@@ -226,7 +212,6 @@ public class DashboardView extends BaseView {
 
         actionsBox.getChildren().add(depositBtn);
 
-        
         String status = "";
         if ("SAVINGS".equals(account.getAccountType())) {
             status = "No withdrawals";
@@ -241,7 +226,6 @@ public class DashboardView extends BaseView {
 
         card.getChildren().addAll(typeLabel, balanceLabel, interestLabel, actionsBox, statusLabel);
 
-        
         depositBtn.setOnAction(e -> {
             DepositView depositView = new DepositView(primaryStage, loginController, accountController, account);
             primaryStage.getScene().setRoot(depositView.getView());
@@ -293,7 +277,6 @@ public class DashboardView extends BaseView {
         buttonsBox.getChildren().addAll(openAccountBtn, depositBtn, withdrawBtn, historyBtn);
         actionsBox.getChildren().addAll(sectionLabel, buttonsBox);
 
-        
         openAccountBtn.setOnAction(e -> {
             OpenAccountView openAccountView = new OpenAccountView(primaryStage, loginController, accountController);
             primaryStage.getScene().setRoot(openAccountView.getView());
@@ -336,18 +319,63 @@ public class DashboardView extends BaseView {
 
         headerBox.getChildren().addAll(sectionLabel, spacer);
 
-        
-        VBox placeholder = new VBox();
-        placeholder.setPrefHeight(100);
-        placeholder.setStyle("-fx-background-color: white; -fx-background-radius: 10px; -fx-border-radius: 10px; -fx-alignment: center;");
+        VBox transactionsBox = new VBox(10);
 
-        Label placeholderLabel = new Label("No recent transactions");
-        placeholderLabel.setStyle("-fx-text-fill: #a0aec0;");
-        placeholder.getChildren().add(placeholderLabel);
+        List<Transaction> recentTransactions = getRecentTransactions();
+        if (recentTransactions.isEmpty()) {
+            VBox placeholder = new VBox();
+            placeholder.setPrefHeight(100);
+            placeholder.setStyle("-fx-background-color: white; -fx-background-radius: 10px; -fx-border-radius: 10px; -fx-alignment: center;");
 
-        activityBox.getChildren().addAll(headerBox, placeholder);
+            Label placeholderLabel = new Label("No recent transactions");
+            placeholderLabel.setStyle("-fx-text-fill: #a0aec0;");
+            placeholder.getChildren().add(placeholderLabel);
+            transactionsBox.getChildren().add(placeholder);
+        } else {
+            for (Transaction transaction : recentTransactions) {
+                HBox transactionRow = createTransactionRow(transaction);
+                transactionsBox.getChildren().add(transactionRow);
+            }
+        }
+
+        activityBox.getChildren().addAll(headerBox, transactionsBox);
 
         return activityBox;
+    }
+
+    private List<Transaction> getRecentTransactions() {
+        List<Transaction> allTransactions = new java.util.ArrayList<>();
+        for (Account account : currentCustomer.getAccounts()) {
+            List<Transaction> accountTransactions = accountController.getAccountTransactions(account.getAccountNumber());
+            allTransactions.addAll(accountTransactions);
+        }
+        allTransactions.sort((t1, t2) -> t2.getDate().compareTo(t1.getDate()));
+        return allTransactions.subList(0, Math.min(5, allTransactions.size()));
+    }
+
+    private HBox createTransactionRow(Transaction transaction) {
+        HBox row = new HBox(20);
+        row.setPadding(new Insets(15));
+        row.setStyle("-fx-background-color: white; -fx-background-radius: 5px; -fx-border-radius: 5px;");
+
+        Label dateLabel = new Label(new java.text.SimpleDateFormat("MMM dd, yyyy").format(transaction.getDate()));
+        dateLabel.setStyle("-fx-text-fill: #4a5568; -fx-font-size: 12px;");
+
+        Label typeLabel = new Label(transaction.getType());
+        typeLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1a365d;");
+
+        Label amountLabel = new Label(String.format("BWP %.2f", transaction.getAmount()));
+        if (transaction.getAmount() > 0) {
+            amountLabel.setStyle("-fx-text-fill: #38a169; -fx-font-weight: bold;");
+        } else {
+            amountLabel.setStyle("-fx-text-fill: #e53e3e; -fx-font-weight: bold;");
+        }
+
+        HBox spacer = new HBox();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        row.getChildren().addAll(dateLabel, typeLabel, spacer, amountLabel);
+        return row;
     }
 
     private HBox createFooter() {
