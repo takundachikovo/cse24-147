@@ -1,0 +1,4 @@
+CUST001|John|Smith|123 Main St, Gaborone|johnsmith|password123
+CUST002|Mary|Johnson|456 Broad St, Francistown|maryj|password123
+CUST003|David|Brown|789 River Rd, Maun|davidb|password123
+CUST1761936922130|Elton|Matare|Tlokweng|elton|123
